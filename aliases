@@ -1,8 +1,8 @@
 
 if [[ "$(uname)" == "Darwin" ]]; then
-    alias ll='ll -laGH'
+    alias ll='ls -laGH'
 elif [[ "$(uname)" == "Linux" ]]; then
-    alias ll='ll -la --group-directories-first --human-readable'
+    alias ll='ls -la --group-directories-first --human-readable'
 fi
 
 alias k="kubectl"
