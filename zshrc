@@ -24,12 +24,27 @@ fi
 
 # Aliases
 
-alias ll="ls -laGH"
+if [[ "$(uname)" == "Darwin" ]]; then
+  alias ll='ls -laGH'
+elif [[ "$(uname)" == "Linux" ]]; then
+    alias ll='ls -la --group-directories-first --human-readable'
+fi
+
+alias k="kubectl"
 alias gl='git log --graph --pretty=format:'\''%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%ad) <%an>%Creset'\'' --abbrev-commit --date=iso'
 alias gs="git status"
 alias dpa="docker ps -a --format 'table {{.ID}}\t{{.Names}}\t{{.CreatedAt}}'"
 alias dli="docker image ls -a --format table"
-alias gfo='git add -A; git commit -m "gfo"; git push'
+alias gfo="git add -A; git commit -m 'gfo'; git push"
+alias hla="helm list all"
+alias kge="kubectl get events --sort-by='\''.metadata.creationTimeStamp'\'''"
+
+
+t() { tree -aC -I '.git' --dirsfirst "$@" | less -FRNX; }
+alias t1='t -L 1'
+alias t2='t -L 2'
+alias t3='t -L 3'
+
 
 # Completion
 
