@@ -49,6 +49,7 @@ alias t3='t -L 3'
 # Completion
 
 autoload -Uz compinit && compinit
+autoload -U +X bashcompinit && bashcompinit
 
 zstyle ':completion:*' menu select
 zstyle ':completion:*' verbose yes
@@ -72,9 +73,13 @@ if command -v kind &>/dev/null; then
   source <(kind completion zsh)
 fi
 
-autoload -U +X bashcompinit && bashcompinit
-complete -o nospace -C /opt/homebrew/bin/terraform terraform
-source $(brew --prefix)/etc/bash_completion.d/az
+if command -v terraform &>/dev/null; then
+  complete -o nospace -C /opt/homebrew/bin/terraform terraform
+fi
+
+if command -v az &>/dev/null; then
+  source $(brew --prefix)/etc/bash_completion.d/az
+fi
 
 # Private
 
