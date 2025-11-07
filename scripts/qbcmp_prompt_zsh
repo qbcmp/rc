@@ -1,0 +1,54 @@
+#!/bin/zsh
+
+setopt prompt_subst
+
+autoload -Uz vcs_info
+zstyle ':vcs_info:git:*' formats '(%b) '
+zstyle ':vcs_info:git:*' actionformats '(%b|%a) '
+
+_k8s_prompt_info=""
+
+precmd() {
+  vcs_info
+  _k8s_prompt_info=$(get_k8s_context)
+}
+
+get_k8s_context() {
+  local k8s_context=$(kubectl config view --minify --output='jsonpath={.current-context}' 2>/dev/null)
+  if [[ -n "$k8s_context" ]]; then
+    local k8s_namespace=$(kubectl config view --minify --output='jsonpath={.contexts[?(@.name=="'''$k8s_context'''")].context.namespace}' 2>/dev/null)
+    k8s_namespace=${k8s_namespace:-default}
+    echo "%F{cyan}${k8s_context}:${k8s_namespace}%f"
+  fi
+}
+
+PROMPT_DEFAULT='%F{8}%m %F{yellow}%1~ %F{green}${vcs_info_msg_0_}%F{white}$ %f'
+PROMPT_K8S='%F{8}%m %F{yellow}%1~ %F{green}${vcs_info_msg_0_}${_k8s_prompt_info} %F{white}$ %f'
+PROMPT="$PROMPT_DEFAULT"
+
+toggle_prompt_style() {
+  if [[ "$PROMPT" == "$PROMPT_DEFAULT" ]]; then
+    PROMPT="$PROMPT_K8S"
+  else
+    PROMPT="$PROMPT_DEFAULT"
+  fi
+  zle reset-prompt
+}
+
+zle -N toggle_prompt_style
+
+bindkey '^u' toggle_prompt_style # Ctrl + u toggles the left prompt
+
+RPROMPT='${_k8s_rprompt_visible:+"${_k8s_prompt_info}"}'
+
+toggle_rprompt_style() {
+  if [[ -n "${_k8s_rprompt_visible}" ]]; then
+    unset _k8s_rprompt_visible
+  else
+    _k8s_rprompt_visible=1
+  fi
+  zle reset-prompt
+}
+
+zle -N toggle_rprompt_style
+bindkey '^b' toggle_rprompt_style # Ctrl + b toggles the right prompt
