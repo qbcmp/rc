@@ -78,7 +78,11 @@ if command -v terraform &>/dev/null; then
 fi
 
 if command -v az &>/dev/null; then
-  source $(brew --prefix)/etc/bash_completion.d/az
+  if [[ "$(uname)" == "Darwin" ]]; then
+    source $(brew --prefix)/etc/bash_completion.d/az
+  elif [[ "$(uname)" == "Linux" ]] && [ -f /etc/bash_completion.d/azure-cli ]; then
+    source /etc/bash_completion.d/azure-cli
+  fi
 fi
 
 # Private
